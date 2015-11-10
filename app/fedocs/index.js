@@ -22,7 +22,7 @@ router.get('/noteslatest/:from/:context_num', function *(next) {
         for(var i=0; i<notes.length; i++){
             var note = notes[i];
             var lines = yield db.collection('t_lines') 
-                .find({note_id: note.note_id}, {_id:0})
+                .find({note_id: note.note_id}, {_id:0, note_id:0, lineno:0})
                 .toArray();
             note.lines = lines;
         }
