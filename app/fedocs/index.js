@@ -10,14 +10,24 @@ router.get('/noteslatest/:from/:context_num', function *(next) {
 
         yield * next;
 
-        var notes = yield this.mongo.db(config.dbName)
-            .collection('t_notes')
+        var db = this.mongo.db(config.dbName);
+        var notes = yield db.collection('t_notes')
             .find({}, {_id:0})
             .sort({modified_time:-1})
             .toArray()
             ;
 
-        this.body = notes.slice(from, from + contextNum);
+        notes = notes.slice(from, from + contextNum);
+
+        for(var i=0; i<notes.length; i++){
+            var note = notes[i];
+            var lines = yield db.collection('t_lines') 
+                .find({note_id: note.note_id}, {_id:0})
+                .toArray();
+            note.lines = lines;
+        }
+
+        this.body = notes;
     })
     ;
 
