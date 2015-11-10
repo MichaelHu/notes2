@@ -1,12 +1,29 @@
-var app = require('koa')();
+var config = require('./config');
 var router = require('koa-router')();
-var config = {
-    staticRoot: '/Users/hudamin/projects/git/mydocs/dist/'
-};
+
+module.exports = router;
+
+router.get('/noteslatest/:from/:context_num', function *(next) {
+        var params = this.params,
+            from = params.from - 0,
+            contextNum = params.context_num - 0;
+
+        yield * next;
+
+        var notes = yield this.mongo.db(config.dbName)
+            .collection('t_notes')
+            .find({}, {_id:0})
+            .sort({modified_time:-1})
+            .toArray()
+            ;
+
+        this.body = notes.slice(from, from + contextNum);
+    })
+    ;
 
 router.get('/notes/:from_note_id/:context_num', function *(next) {
         yield * next;
-        this.body = yield this.mongo.db('myproject')
+        this.body = yield this.mongo.db(config.dbName)
             .collection('t_notes')
             .find({note_id: {$gte: this.params.from_note_id - 0}})
             .limit(this.params.context_num - 0 + 1)
@@ -16,12 +33,12 @@ router.get('/notes/:from_note_id/:context_num', function *(next) {
 
 router.get('/note/:note_id', function *(next) {
         yield * next;
-        var lines = yield this.mongo.db('myproject')
+        var lines = yield this.mongo.db(config.dbName)
                 .collection('t_lines')
                 .find({note_id: this.params.note_id - 0})
                 .toArray();
 
-        var note = yield this.mongo.db('myproject')
+        var note = yield this.mongo.db(config.dbName)
                 .collection('t_notes')
                 .find({note_id: this.params.note_id - 0})
                 .toArray();
@@ -39,7 +56,7 @@ router.get('/notelines/:line/:context_num/:direction', function *(next) {
 
         var _ = require('underscore');
 
-        var lines = yield this.mongo.db('myproject')
+        var lines = yield this.mongo.db(config.dbName)
                 .collection('t_lines')
                 .find({$and: [
                     {lineno: {$lte: line + contextNum}}
@@ -75,7 +92,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
         var _keywords = {};
         for(var i=0; i<keywords.length; i++){
             _keywords['key_word_' + ( i + 1 )] = keywords[i];
-            keywords[i] = keywords[i].replace(/[\\*|.^$?+{}\[\]-]/g, '\\$&');
+            keywords[i] = keywords[i].replace(/[\\*|.^$?+{}\[\]\(\)-]/g, '\\$&');
         }
 
         var regArr = [];
@@ -87,7 +104,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
             });
         }
 
-        var db = this.mongo.db('myproject');
+        var db = this.mongo.db(config.dbName);
 
         var lines = yield db.collection('t_lines')
                 .find({$and: regArr})
@@ -126,21 +143,5 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
     })
     ;
 
-app.use(require('koa-gzip')())
-    .use(require('koa-static')(config.staticRoot))
-    .use(require('koa-mongo')({
-        host: 'localhost'
-        , port: 27017
-        , db: 'myproject'
-        , max: 100
-        , min: 1
-        , timeout: 30000
-        , log: false
-    }))
-    .use(router.routes())
-    .use(router.allowedMethods());
 
-app.listen(3000);
-
-console.log('Listening on port 3000 ...');
 
