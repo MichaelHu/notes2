@@ -1,8 +1,8 @@
 var config = {
-    port: 8345
+    port: 3200
     , dbHost: '10.10.10.184'
     , dbName: 'fedocs'
-    , dbPort: 7500
+    , dbPort: 8345
 };
 
 module.exports = config;
