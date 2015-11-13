@@ -1,5 +1,5 @@
 var config = {
-    port: 3200
+    port: 8345
     , dbHost: '10.10.10.184'
     , dbName: 'fedocs'
     , dbPort: 7500
