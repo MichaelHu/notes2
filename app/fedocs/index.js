@@ -3,6 +3,50 @@ var router = require('koa-router')();
 
 module.exports = router;
 
+router.get('/authors', function *(next) {
+
+        yield * next;
+
+        var db = this.mongo.db(config.dbName);
+        var notes = yield db.collection('t_notes')
+            .aggregate([  
+                {  
+                    $group: { 
+                        _id: '$author'
+                        // , notes: {
+                        //     $push: {
+                        //         file_name: '$file_name'
+                        //         , modified_time: '$modified_time'
+                        //     } 
+                        // }
+                        , count: {$sum: 1}    
+                    }      
+                }
+            ])
+            .toArray()
+            ;
+
+        this.body = notes;
+    })
+    ;
+
+router.get('/notes-by-author/:author', function *(next) {
+        var params = this.params,
+            author = params.author;
+
+        yield * next;
+
+        var db = this.mongo.db(config.dbName);
+        var notes = yield db.collection('t_notes')
+            .find({author: author}, {_id:0})
+            .sort({modified_time:-1})
+            .toArray()
+            ;
+
+        this.body = notes;
+    })
+    ;
+
 router.get('/noteslatest/:from/:context_num', function *(next) {
         var params = this.params,
             from = params.from - 0,
