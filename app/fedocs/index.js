@@ -23,6 +23,7 @@ router.get('/authors', function *(next) {
                     }      
                 }
             ])
+            .sort({count: -1})
             .toArray()
             ;
 
