@@ -145,9 +145,9 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
             count = params.count - 0;
 
         keywords = keywords.split(/\s+\+\s+/);
-        var _keywords = {};
+        var _keywords = [];
         for(var i=0; i<keywords.length; i++){
-            _keywords['key_word_' + ( i + 1 )] = keywords[i];
+            _keywords.push(keywords[i]);
             keywords[i] = keywords[i].replace(/[\\*|.^$?+{}\[\]\(\)-]/g, '\\$&');
         }
 
@@ -197,7 +197,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
         this.body = {
             count: lines.length 
             , lines: allLines 
-            , keywords: keywords 
+            , keywords: _keywords 
         };
     })
     ;
