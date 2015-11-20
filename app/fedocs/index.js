@@ -171,10 +171,13 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
         for(var i=from-1, cnt=0; i<lines.length && cnt<count; i++, cnt++){
             allLines = allLines.concat(
                 yield db.collection('t_lines')
-                    .find({$and: [
-                        {lineno: {$gte: lines[i].lineno - contextNum}}
-                        , {lineno: {$lte: lines[i].lineno + contextNum}}
-                    ]})
+                    .find(
+                        {$and: [
+                            {lineno: {$gte: lines[i].lineno - contextNum}}
+                            , {lineno: {$lte: lines[i].lineno + contextNum}}
+                        ]}
+                        , {_id:0}
+                    )
                     .toArray()
             );
         }
@@ -191,11 +194,11 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
 
         console.log(allLines.length);
 
-        this.body = [
-            { count: lines.length }
-            , allLines 
-            , _keywords 
-        ];
+        this.body = {
+            count: lines.length 
+            , lines: allLines 
+            , keywords: _keywords 
+        };
     })
     ;
 
