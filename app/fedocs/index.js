@@ -168,7 +168,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
 
         var allLines = [];
 
-        for(var i=from-1, cnt=0; i<lines.length && cnt<count; i++, cnt++){
+        for(var i=from, cnt=0; i<lines.length && cnt<count; i++, cnt++){
             allLines = allLines.concat(
                 yield db.collection('t_lines')
                     .find(
@@ -197,7 +197,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
         this.body = {
             count: lines.length 
             , lines: allLines 
-            , keywords: _keywords 
+            , keywords: keywords 
         };
     })
     ;
