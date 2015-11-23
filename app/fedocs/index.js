@@ -175,6 +175,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
                         {$and: [
                             {lineno: {$gte: lines[i].lineno - contextNum}}
                             , {lineno: {$lte: lines[i].lineno + contextNum}}
+                            , {note_id: lines[i].note_id}
                         ]}
                         , {_id:0}
                     )
