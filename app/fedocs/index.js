@@ -87,12 +87,17 @@ router.get('/notes/:from_note_id/:context_num', function *(next) {
     })
     ;
 
-router.get('/note/:note_id', function *(next) {
+router.get('/note/:note_id/:has_lines', function *(next) {
         yield * next;
-        var lines = yield this.mongo.db(config.dbName)
-                .collection('t_lines')
-                .find({note_id: this.params.note_id - 0})
-                .toArray();
+
+        var lines = [];
+        
+        if (this.params.has_lines - 0 == 1) {
+            lines = yield this.mongo.db(config.dbName)
+                    .collection('t_lines')
+                    .find({note_id: this.params.note_id - 0})
+                    .toArray();
+        }
 
         var note = yield this.mongo.db(config.dbName)
                 .collection('t_notes')
