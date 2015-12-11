@@ -169,6 +169,7 @@ router.get('/notesearch/:keywords/:context_num/:from/:count', function *(next) {
 
         var lines = yield db.collection('t_lines')
                 .find({$and: regArr})
+                .sort({lineno: 1})
                 .toArray();
 
         var allLines = [];
